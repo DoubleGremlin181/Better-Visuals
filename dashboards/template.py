@@ -47,6 +47,7 @@ def create_dash_app(server, google, dashboard_metadata):
                     [
                         dbc.DropdownMenuItem("Email: ", header=True, id="email-display"),
                         dbc.DropdownMenuItem(divider=True),
+                        dbc.DropdownMenuItem("Clear Data", id="clear-data", n_clicks=0),
                         dbc.DropdownMenuItem("Logout", href="/logout", external_link=True),
                     ],
                     nav=True,
@@ -136,6 +137,7 @@ def create_dash_app(server, google, dashboard_metadata):
                     # Add padding between the navbar and the top of the cards, and re-add padding for the cards
                 ),
                 footer,
+                dcc.Location(id='url'),
                 dcc.Store(id='iris-df'),
             ],
             className="dbc",
@@ -192,6 +194,16 @@ def create_dash_app(server, google, dashboard_metadata):
         iris_scatter_matrix_fig = px.scatter_matrix(iris_df, dimensions=dims, color="species")
 
         return iris_scatter_fig, iris_parallel_fig, iris_contour_fig, iris_scatter_matrix_fig
+
+    @dash_app.callback(
+        dd.Output('url', 'href'),
+        dd.Input("clear-data", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def clear_data(_):
+        save_folder = [storage['name'] for storage in dashboard_metadata["storage"] if storage['type'] == 'folder'][0]
+        clear_data_from_disk(save_folder=save_folder, userid=session['id'])
+        return dashboard_metadata['url_base_pathname']
 
     @dash_app.callback(
         dd.Output("email-display", "children"),

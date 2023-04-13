@@ -1,4 +1,5 @@
 import os
+import shutil
 
 
 def save_data_to_disk(data, filename, save_folder, userid):
@@ -23,3 +24,10 @@ def fetch_data_from_disk(filename, save_folder, userid):
 
 def check_if_saved_data_exists(filename_list, save_folder, userid):
     return all(os.path.exists(os.path.join('saved_data', save_folder, userid, filename)) for filename in filename_list)
+
+
+def clear_data_from_disk(save_folder, userid):
+    DATAPATH_FOLDER = os.path.join('saved_data', save_folder)
+    DATAPATH_USER = os.path.join(DATAPATH_FOLDER, userid)
+    if os.path.exists(DATAPATH_USER):
+        shutil.rmtree(DATAPATH_USER)
